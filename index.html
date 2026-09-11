@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>咖啡赛事台 · 杯测入门与赛事日历</title>
+<style>
+  :root{
+    --bg:#f4efe6; --card:#fffdf8; --ink:#2b2118; --ink2:#6b5a48; --ink3:#a2907d;
+    --accent:#a96a2f; --accent2:#c98a4b; --gold:#d9b36c; --line:#e8dfd0;
+    --green:#3e7c4f; --amber:#b97b2e; --red:#b0563a; --gray:#8a7a68;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'PingFang SC','Microsoft YaHei',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;}
+  header.hero{
+    background:linear-gradient(135deg,#3a2416 0%,#5a3820 55%,#7a4d24 100%);
+    color:#f7ead6;padding:34px 24px 28px;text-align:center;
+  }
+  header.hero h1{font-size:26px;letter-spacing:2px;}
+  header.hero .sub{font-size:13px;color:#d9c7ab;margin-top:6px;}
+  header.hero .meta{font-size:12px;color:#b99f7f;margin-top:10px;}
+  nav{display:flex;background:#2b1d12;position:sticky;top:0;z-index:10;overflow-x:auto;}
+  nav button{flex:1;min-width:88px;background:transparent;border:none;color:#cfc0a9;padding:13px 8px;font-size:14px;cursor:pointer;white-space:nowrap;}
+  nav button.on{color:#ffd9a0;box-shadow:inset 0 -3px 0 var(--gold);font-weight:600;}
+  main{max-width:1080px;margin:0 auto;padding:18px 16px 60px;}
+  .view{display:none;}
+  .view.on{display:block;}
+  h2.sec{font-size:19px;margin:22px 0 6px;display:flex;align-items:baseline;gap:8px;}
+  h2.sec small{font-size:12px;color:var(--ink3);font-weight:400;}
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px;margin-top:12px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px;box-shadow:0 1px 3px rgba(60,40,15,.05);}
+  .card .row1{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+  .card h3{font-size:15.5px;line-height:1.45;}
+  .card .badges{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px;}
+  .badge{font-size:11px;padding:2px 8px;border-radius:20px;white-space:nowrap;}
+  .b-cat{background:#f3e3cc;color:#8a5a24;}
+  .b-lv{background:#eae2f6;color:#5b4a8a;}
+  .b-region{background:#e4efe6;color:#35684a;}
+  .b-new{background:#fbe0d8;color:#a83e28;font-weight:700;}
+  .card .facts{font-size:12.5px;color:var(--ink2);line-height:1.7;}
+  .card .facts b{color:var(--ink);font-weight:600;}
+  .card .desc{font-size:13px;color:var(--ink2);}
+  .card .route{font-size:12px;color:var(--ink3);border-top:1px dashed var(--line);padding-top:6px;}
+  .card .route b{color:#7a5a2e;}
+  .card .src{font-size:11px;color:var(--ink3);}
+  .ev-link{display:inline-flex;align-items:center;gap:5px;background:var(--accent);color:#fff;font-size:13px;font-weight:600;padding:8px 14px;border-radius:10px;text-decoration:none;margin-top:4px;align-self:flex-start;}
+  .ev-link:hover{background:var(--accent2);}
+  .card .meta-links{margin-top:auto;display:flex;flex-direction:column;gap:4px;}
+  .st-open{color:var(--green);} .st-soon{color:var(--amber);} .st-done{color:var(--gray);}
+  .guide-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-top:12px;}
+  .g-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;}
+  .g-card h3{font-size:15px;margin-bottom:8px;color:#5a3820;}
+  .g-card p{font-size:13px;color:var(--ink2);}
+  .g-card ul{font-size:13px;color:var(--ink2);padding-left:18px;margin-top:6px;}
+  .g-card li{margin:3px 0;}
+  .step-flow{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 4px;align-items:center;}
+  .step{background:#f3e3cc;border:1px solid #e2c9a5;border-radius:10px;padding:7px 12px;font-size:12.5px;color:#6b4a1e;}
+  .step b{color:#3a2416;}
+  .arrow{color:var(--accent);font-weight:700;}
+  .track{display:flex;flex-direction:column;gap:12px;margin-top:12px;}
+  .track-item{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;padding:14px 16px;}
+  .track-item h3{font-size:15px;}
+  .track-item .t-sub{font-size:12px;color:var(--ink3);margin-bottom:6px;}
+  .track-item p{font-size:13px;color:var(--ink2);}
+  .player-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-top:12px;}
+  .player{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;gap:12px;}
+  .player .avatar{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#c98a4b,#8a5a24);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;flex-shrink:0;}
+  .player h3{font-size:15px;}
+  .player .tag{font-size:11px;color:var(--accent);}
+  .player p{font-size:12.5px;color:var(--ink2);margin-top:4px;}
+  .ch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-top:12px;}
+  .ch-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;}
+  .ch-card h3{font-size:15px;margin-bottom:6px;}
+  .ch-card p{font-size:13px;color:var(--ink2);}
+  .ch-card .ch-link{display:inline-block;margin-top:8px;font-size:13px;color:var(--accent);font-weight:600;text-decoration:none;}
+  .note{background:#f7efe0;border:1px solid #e6d5b8;border-radius:12px;padding:12px 14px;font-size:13px;color:#6b5a3a;margin-top:12px;}
+  .filters{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 2px;}
+  .filters button{font-size:12.5px;padding:5px 13px;border-radius:20px;border:1px solid var(--line);background:var(--card);color:var(--ink2);cursor:pointer;}
+  .filters button.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600;}
+  .ladder{width:100%;max-width:640px;height:auto;margin:12px auto;display:block;}
+  @media (max-width:640px){
+    header.hero h1{font-size:21px;}
+    .cards,.guide-grid,.player-grid,.ch-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <h1>☕ 咖啡赛事台</h1>
+  <div class="sub">杯测入门 · 赛事日历 · 参赛指南 · 渠道关注</div>
+  <div class="meta" id="data-update">数据更新：2026-09-10 · 每日自动巡检最新赛事</div>
+</header>
+
+<nav id="nav">
+  <button data-v="home" class="on">首页</button>
+  <button data-v="events">赛事日历</button>
+  <button data-v="guide">参赛指南</button>
+  <button data-v="channels">渠道关注</button>
+</nav>
+
+<main>
+  <!-- 首页 -->
+  <section class="view on" id="v-home">
+    <h2 class="sec">从杯测开始 🎯</h2>
+    <div class="note">杯测（Cupping）是咖啡竞技里门槛最低、最容易入手的赛道：不拼拉花手法、不拼机器设备，考验的是"舌头 + 训练量"。练好杯测的感官基本功，冲煮、品鉴、咖啡师赛道都会跟着受益。</div>
+
+    <h2 class="sec">四档赛道怎么选 <small>按门槛从低到高</small></h2>
+    <div class="track" id="home-track"></div>
+
+    <h2 class="sec">杯测入门三步走</h2>
+    <div class="guide-grid">
+      <div class="g-card"><h3>① 先练舌头</h3><p>每周参加 1 场杯测会/品鉴会（音季 30 城巡回、PCA 品鉴师赛前体验），一次喝 20–30 支豆子，建立香气与风味记忆库。</p></div>
+      <div class="g-card"><h3>② 用小赛练兵</h3><p>报名低门槛赛事：CCC 中国咖啡杯测大赛城市赛（约 150 元）、PCA 品鉴师竞技赛、CCT 品鉴师大赛。输赢不重要，先感受比赛节奏与规则。</p></div>
+      <div class="g-card"><h3>③ 冲击大赛</h3><p>拿到城市赛名次后，冲世界杯测大赛中国区总决赛（CCTC）——国内唯一直通世界赛的杯测官方通道。</p></div>
+    </div>
+
+    <h2 class="sec">选手榜样</h2>
+    <div class="player-grid" id="home-players"></div>
+  </section>
+
+  <!-- 赛事日历 -->
+  <section class="view" id="v-events">
+    <h2 class="sec">赛事日历 <small id="ev-count"></small></h2>
+    <div class="filters" id="filters"></div>
+    <div class="cards" id="ev-list"></div>
+    <div class="note">⚠️ 报名信息以主办方官方发布为准。卡片按钮可直达官方报名页/发布页。</div>
+  </section>
+
+  <!-- 参赛指南 -->
+  <section class="view" id="v-guide">
+    <h2 class="sec">参赛指南</h2>
+
+    <h2 class="sec" style="font-size:16px;">世界杯测大赛中国区总决赛 CCTC</h2>
+    <div class="g-card">
+      <p><b>主办方：</b>上海博华国际展览有限公司（World Coffee Championships 授权）</p>
+      <p><b>含金量：</b>国内唯一直通世界杯测总决赛的官方选拔赛。冠军代表中国出战世界赛，也是"世界杯测师"头衔在国内唯一的官方敲门砖。</p>
+      <p><b>历史规模：</b>2024 届约 120 人参赛，2025 届约 140 人；参赛者多为专业咖啡师、烘焙师与品控，也有资深爱好者。</p>
+      <p><b>时间：</b>每年 3–4 月，随上海国际酒店及餐饮业博览会（HOTELEX）同期举办。</p>
+      <p><b>选手：</b>2025 中国区冠军胡娟，代表中国出战世界赛；麦世宗 2025 世界杯测获世界亚军，2026 Open de Cata 全球总冠军（首位亚洲籍冠军）。</p>
+    </div>
+
+    <h2 class="sec" style="font-size:16px;">中国咖啡杯测大赛 CCC（城市赛）</h2>
+    <div class="g-card">
+      <p><b>主办方：</b>中国咖啡杯测大赛组委会（官方抖音/公众号发布各赛区信息）</p>
+      <p><b>含金量：</b>全国规模最大的纯杯测城市巡回赛，覆盖 28 省 126 城；城市赛胜出晋级全国总决赛，是杯测新手最现实的晋级路径。</p>
+      <p><b>历史规模：</b>累计 5500+ 人次参赛、130+ 场城市赛。</p>
+      <p><b>规则要点：</b>年满 16 周岁即可报名；可跨赛区参赛（不限制户籍/工作地）；报名费约 150 元/场；形式为三角杯测（Triangle），多轮淘汰。</p>
+    </div>
+
+    <h2 class="sec" style="font-size:16px;">低门槛入门档</h2>
+    <div class="guide-grid">
+      <div class="g-card"><h3>CCT 中国咖啡品鉴师大赛</h3><p>中国商业联合会主办，面向全产业链品控与品鉴从业者，咖啡师/烘焙师/爱好者均可报名，优秀选手晋级全国总决赛。</p></div>
+      <div class="g-card"><h3>PCA 品鉴师竞技赛</h3><p>民间赛事，2022 年推出品鉴师线，累计 300+ 场、15000+ 人次参赛，以赛代练，门槛友好。</p></div>
+      <div class="g-card"><h3>音季巡回杯测会（30 城）</h3><p>免费/低收费，一场喝 20–30 支豆子，性价比最高的"练舌头"方式，部分场次赠精品熟豆礼盒。</p></div>
+    </div>
+
+    <h2 class="sec">报名前 Checklist</h2>
+    <div class="g-card">
+      <ul>
+        <li>✅ 确认年龄/资质：CCC 要求年满 16；职业赛（咖啡师/冲煮）一般需从业经历或门店背书</li>
+        <li>✅ 确认时间地点与截止日：城市赛多为单日，报名通道提前 1–2 周关闭</li>
+        <li>✅ 自备工具：杯测勺、围裙、止呕桶（部分赛事提供，提前确认）</li>
+        <li>✅ 训练建议：赛前两周每天练三角杯测，重点练"分辨细微发酵/烘焙瑕疵"</li>
+        <li>✅ 心态：城市赛高手密度高，首战目标定为"跑完全程 + 认识同行"</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 渠道关注 -->
+  <section class="view" id="v-channels">
+    <h2 class="sec">赛事渠道关注 <small>国内暂无垂直聚合号，建议订阅以下官方源</small></h2>
+    <div class="ch-grid" id="ch-list"></div>
+    <div class="note">💡 本站在 GitHub Actions 上每日自动巡检 HOTELEX 官方赛事栏目，发现新赛事会自动收录到"赛事日历"，无需手动刷新。</div>
+  </section>
+</main>
+
+<script>
+(function(){
+  var EVENTS = [
+    {id:1,name:"2026 中国咖啡杯测大赛 · 苏州赛区",cat:"tasting",lv:"城市赛",date:"9 月 16 日",place:"苏州",fee:"约 150 元",status:"soon",statusTxt:"即将开赛 · 尽快确认报名",region:"江浙沪",desc:"2026 城市赛收官前的华东站，年满 16、不限地域、可跨赛区，胜出晋级全国总决赛。",route:"城市赛 → 全国总决赛",ch:"抖音 #中国咖啡杯测大赛 · 赛区承办方",src:"来源：中国咖啡杯测大赛官方（抖音）",link:"https://www.iesdouyin.com/share/video/7672690180653960448",linkTxt:"官方发布 · 报名规则",isNew:true},
+    {id:2,name:"2026 云南国际咖啡杯测赛（全民趣味擂台赛）",cat:"tasting",lv:"省级 · 全民",date:"9 月 19 日",place:"昆明 · 滇池国际会展中心",fee:"免费（60 名额）",status:"soon",statusTxt:"线上预报名 · 报满即止",region:"西南",desc:"零门槛全民杯测擂台，不设从业资质门槛，普通人也能角逐感官王者，名额仅 60 人。",route:"趣味挑战 · 非晋级制",ch:"云南国际咖啡双赛盛典线上预报名",src:"来源：人民日报欧洲网（2026-08-26）",link:"http://www.peopledaily.eu/zgxw/20260826_124283.html",linkTxt:"官方报道 · 报名通道",isNew:true},
+    {id:3,name:"2026 中国咖啡杯测大赛 · 贵阳赛区",cat:"tasting",lv:"城市赛",date:"9 月 24 日",place:"贵阳国际会议展览中心",fee:"约 150 元",status:"soon",statusTxt:"招募中 · 席位有限",region:"西南",desc:"落地贵阳国际咖啡博览会，面向全国招募咖啡师、烘焙师与爱好者，胜出晋级全国总决赛。",route:"城市赛 → 全国总决赛",ch:"抖音 #中国咖啡杯测大赛 · 贵阳市咖啡行业协会",src:"来源：中国咖啡杯测大赛官方（抖音）",link:"https://www.iesdouyin.com/share/video/7680020954248049641",linkTxt:"官方发布 · 报名入口"},
+    {id:4,name:"2026 昆山国际精品咖啡展暨咖啡节",cat:"sensory",lv:"展会 · 观赛",date:"9 月 24–26 日",place:"昆山国际会展中心",fee:"观赛免费（预约）",status:"soon",statusTxt:"免费预约入场",region:"江浙沪",desc:"同期举办 2027 世界咖啡师大赛中国区·昆山分区赛、2027 拉花中国区·昆山分区赛、2026 世界烘焙大赛中国区·昆山分区赛，还有冠军主理人市集可近距离交流。",route:"观赛 / 交流 / 品牌对接",ch:"HOTELEX Kunshan 预约通道",src:"来源：昆山论坛 / HOTELEX（2026-09-10）",link:"https://www.ksbbs.com/m/read/index/tid/6719576/",linkTxt:"预约入场入口"},
+    {id:5,name:"CCT 中国咖啡品鉴师大赛 · 贵阳站",cat:"sensory",lv:"全国分站",date:"9 月（贵阳）",place:"贵阳",fee:"以官方为准",status:"open",statusTxt:"全国招募中",region:"西南",desc:"中国商业联合会主办，面向全产业链品控与品鉴从业者，咖啡师、烘焙师、爱好者均可报名，优秀选手晋级全国总决赛。",route:"分站 → 全国总决赛",ch:"CCT 官方发布 · 贵阳咖啡博览会",src:"来源：什么值得买社区（2026-08）",link:"https://post.m.smzdm.com/p/ak8d9l29/",linkTxt:"赛事信息汇总"},
+    {id:6,name:"音季夏季巡回杯测会（30 城）",cat:"tasting",lv:"杯测会 · 练习",date:"至 9 月 30 日",place:"全国 30 城",fee:"免费 / 低收费",status:"open",statusTxt:"进行中",region:"全国",desc:"不比只喝：一场喝 20–30 支不同产区豆子，部分场次赠精品熟豆礼盒，是性价比最高的练舌头方式。",route:"体验 · 无晋级",ch:"检索“音季 杯测会 + 城市名”",src:"来源：什么值得买社区（2026-08）",link:"https://post.m.smzdm.com/p/ak8d9l29/",linkTxt:"了解详情"},
+    {id:7,name:"PCA 专业咖啡品鉴师竞技赛",cat:"sensory",lv:"民间 · 全国",date:"2026 全年多赛区",place:"31 省 + 海外",fee:"低门槛",status:"open",statusTxt:"滚动办赛",region:"全国",desc:"2022 年推出品鉴师线，累计 300+ 场、15000+ 人次参赛，以赛代练、门槛友好，适合新手。",route:"分赛区晋级",ch:"PCA 官方公众号 / 微博",src:"来源：搜狐 / PCA 官方（2026-05）",link:"https://m.sohu.com/a/1025106564_700834/",linkTxt:"赛区与报名表"},
+    {id:8,name:"2027 世界咖啡杯测大赛中国区总决赛（CCTC）",cat:"tasting",lv:"国际 · 中国区",date:"每年 3–4 月（上海 HOTELEX 展）",place:"上海 · 国家会展中心",fee:"以官方为准",status:"open",statusTxt:"2027 赛季已启动",region:"全国",desc:"WCC 授权、上海博华主办，国内唯一直通世界杯测总决赛的官方选拔赛。2024 届 120 人、2025 届 140 人参赛，冠军代表中国出战。",route:"中国区总决赛 → 世界赛",ch:"hotelex.cn · HOTELEX 公众号",src:"来源：中国工业新闻网 / 上海博华（2026-05）",link:"https://www.hotelex.cn/category/event/competition/coffee",linkTxt:"HOTELEX 官方赛事页"},
+    {id:9,name:"2027 世界咖啡师大赛中国区选拔赛（CBC）",cat:"barista",lv:"国际 · 中国区",date:"25–26 赛季已过南京站",place:"太原→合肥→深圳→南京→台州→…",fee:"以官方为准",status:"done",statusTxt:"赛季推进中 · 关注新赛区",region:"全国",desc:"2003 年博华引入中国，全国分区赛晋级制。2025 年中国区冠军孙磊获世界总决赛亚军，创中国最佳。昆山分区赛 9/24–26。",route:"分区赛 → 中国区 → 世界赛",ch:"hotelex.cn · HOTELEX 公众号",src:"来源：上海博华 / 昆山展（2026）",link:"https://www.hotelex.cn/category/event/competition/coffee",linkTxt:"HOTELEX 官方赛事页"},
+    {id:10,name:"钱潮杯咖啡师职业技能竞赛暨 CCP 全国手冲咖啡大赛",cat:"brew",lv:"全国 · 职业技能",date:"10 月 9–18 日",place:"北京 → 浙江旅游职业学院",fee:"以官方为准",status:"soon",statusTxt:"报名进行中",region:"全国",desc:"北方赛区初赛 10/9–10（北京）、南方赛区初赛 10/16–17、全国总决赛 10/18，全国从业者与爱好者可报。",route:"初赛 → 全国总决赛",ch:"小咖侠微信小程序",src:"来源：网易新闻（2026-08-26）",link:"https://www.163.com/dy/article/L597BAGC0525EFU5.html",linkTxt:"报名细则"},
+    {id:11,name:"2026 星巴克中国咖啡师大赛 · 区域赛",cat:"barista",lv:"品牌赛事",date:"区域赛进行中",place:"常州 / 苏州 / 上海 / 合肥 / 无锡 / 扬州",fee:"以官方为准",status:"open",statusTxt:"区域限定开放",region:"江浙沪",desc:"品牌方自办赛事，区域限定、席位有限，适合就近感受竞赛氛围与体验赛场级标准。",route:"区域赛 → 全国",ch:"星巴克中国官方微博 / 门店",src:"来源：星巴克上海微博（2026-08）",link:"https://m.weibo.cn/detail/5331793645409541",linkTxt:"官方微博"},
+    {id:12,name:"2026 中国咖啡杯测大赛 · 已办赛区",cat:"tasting",lv:"城市赛",date:"4–8 月已完赛",place:"济南 / 延吉 / 上海闵行 / 天津 / 太原 / 南宁 / 北京",fee:"约 150 元",status:"done",statusTxt:"已完赛 · 参考规模",region:"全国",desc:"参考单站规模：上海闵行站 108 人角逐 8 张总决赛门票，含连续三年进决赛的易杨等老将。未晋级的选手可继续报名其它赛区。",route:"参考数据",ch:"各赛区承办方",src:"来源：新民晚报 / 腾讯新闻（2026）",link:"https://m.toutiao.com/group/7640433980285649434/",linkTxt:"往期赛况参考"}
+  ];
+  var DATA_UPDATED = "2026-09-10";
+  var CATKEYS = {all:"全部",tasting:"杯测",sensory:"品鉴/感官",barista:"咖啡师",latte:"拉花",brew:"冲煮",roast:"烘焙"};
+
+  var TRACKS = [
+    {t:"杯测（Cupping）",sub:"门槛最低 · 只需舌头 + 训练量",d:"三角杯测/杯测对比，规则直观，一场 30–60 分钟。适合 0 基础入坑。",e:"CCC 城市赛 → CCTC 中国区总决赛 → 世界杯测大赛"},
+    {t:"品鉴师 / 感官",sub:"行业刚需 · 品控向",d:"偏风味描述与品质分级，与采购、烘焙、品控职业路线强相关。",e:"CCT 品鉴师大赛 / PCA 品鉴师竞技赛"},
+    {t:"冲煮（Brewers Cup）",sub:"手冲爱好者的赛道",d:"在限定时间内用手冲方式呈现一杯好咖啡，讲萃取方案与风味表达。",e:"CCPC 全国手冲咖啡大赛 → 世界冲煮大赛中国区"},
+    {t:"咖啡师（Barista）",sub:"综合实力 · 门槛最高",d:"意式浓缩 + 牛奶 + 创意饮品全流程，拼出品、拼表达、拼临场。",e:"CBC 分区赛 → 中国区 → 世界咖啡师大赛"}
+  ];
+  var PLAYERS = [
+    {name:"胡娟",tag:"2025 世界杯测大赛中国区冠军",d:"代表中国出战世界杯测总决赛，杯测赛道最直接的上升样板。"},
+    {name:"麦世宗",tag:"2025 世界杯测亚军 · 2026 Open de Cata 全球总冠军",d:"首位拿下 Open de Cata 全球总冠军的亚洲籍选手。"},
+    {name:"孙磊",tag:"2025 世界咖啡师大赛中国区冠军 · 世界总决赛亚军",d:"中国咖啡师在世界赛上的历史最佳成绩。"},
+    {name:"易杨",tag:"CCC 中国咖啡杯测大赛决赛常客",d:"连续三年进入全国总决赛，民间赛事的稳定实力派。"}
+  ];
+  var CHANNELS = [
+    {name:"上海博华 HOTELEX（官方）",d:"世界杯测/咖啡师/冲煮/拉花/烘焙大赛中国区赛事总出口，报名与赛程权威发布。",link:"https://www.hotelex.cn/category/event/competition/coffee",txt:"hotelex.cn 赛事栏目"},
+    {name:"中国咖啡杯测大赛（官方）",d:"CCC 城市赛各赛区报名与赛况发布，覆盖 28 省 126 城。",link:"https://www.douyin.com/search/中国咖啡杯测大赛",txt:"抖音官方号"},
+    {name:"PCA 专业咖啡竞技赛",d:"品鉴师竞技赛等民间赛事的赛区与报名表。",link:"https://m.sohu.com/a/1025106564_700834/",txt:"赛区与报名表"},
+    {name:"CCT 中国咖啡品鉴师大赛",d:"中国商业联合会下属品鉴师赛事发布。",link:"https://post.m.smzdm.com/p/ak8d9l29/",txt:"赛事信息汇总"}
+  ];
+
+  function stCls(s){return s==="open"?"st-open":(s==="soon"?"st-soon":"st-done");}
+
+  function evHtml(e){
+    var badges = '<span class="badge b-cat">'+(CATKEYS[e.cat]||e.cat)+'</span>'
+      + '<span class="badge b-lv">'+e.lv+'</span>'
+      + '<span class="badge b-region">'+e.region+'</span>'
+      + (e.isNew?'<span class="badge b-new">NEW</span>':'');
+    var status = '<span class="'+stCls(e.status)+'">'+e.statusTxt+'</span>';
+    var link = e.link ? '<a class="ev-link" href="'+e.link+'" target="_blank" rel="noopener">'+e.linkTxt+' ↗</a>' : '';
+    return '<div class="card"><div class="row1"><h3>'+e.name+'</h3></div>'
+      + '<div class="badges">'+badges+'</div>'
+      + '<div class="facts"><b>时间：</b>'+e.date+'<br><b>地点：</b>'+e.place+'<br><b>费用：</b>'+e.fee+'<br><b>状态：</b>'+status+'</div>'
+      + '<div class="desc">'+e.desc+'</div>'
+      + '<div class="route"><b>晋级路径：</b>'+e.route+'<br><b>报名渠道：</b>'+e.ch+'</div>'
+      + '<div class="meta-links">'+link+'<span class="src">'+e.src+'</span></div></div>';
+  }
+
+  var evState={cat:"全部",region:"全部"};
+  function renderFilters(){
+    var el=document.getElementById("filters");
+    var html='<button class="'+(evState.cat==="全部"?"on":"")+'" data-k="全部">全部</button>';
+    var keys=["tasting","sensory","barista","brew","latte","roast"];
+    keys.forEach(function(k){html+='<button class="'+(evState.cat===k?"on":"")+'" data-k="'+k+'">'+CATKEYS[k]+'</button>';});
+    html+='<span style="margin:0 6px;"></span>';
+    ["全部","江浙沪","西南","华南","华中","北方","全国"].forEach(function(r){
+      html+='<button class="'+(evState.region===r?"on":"")+'" data-r="'+r+'">'+r+'</button>';
+    });
+    el.innerHTML=html;
+    el.querySelectorAll("button[data-k]").forEach(function(b){
+      b.addEventListener("click",function(){evState.cat=b.getAttribute("data-k");renderFilters();renderEvents();});
+    });
+    el.querySelectorAll("button[data-r]").forEach(function(b){
+      b.addEventListener("click",function(){evState.region=b.getAttribute("data-r");renderFilters();renderEvents();});
+    });
+  }
+  function renderEvents(){
+    var list=EVENTS.filter(function(e){return evState.cat==="全部"||e.cat===evState.cat;})
+      .filter(function(e){return evState.region==="全部"||e.region===evState.region;});
+    document.getElementById("ev-list").innerHTML=list.length?list.map(evHtml).join(""):'<p style="color:var(--ink3);padding:20px;">暂无匹配赛事。</p>';
+    document.getElementById("ev-count").textContent="共 "+list.length+" 场";
+  }
+
+  function renderHome(){
+    document.getElementById("home-track").innerHTML=TRACKS.map(function(t){
+      return '<div class="track-item"><h3>'+t.t+'</h3><div class="t-sub">'+t.sub+'</div><p>'+t.d+'</p><div class="step-flow"><span class="step"><b>路径：</b>'+t.e.split(" → ").join('</span><span class="arrow">→</span><span class="step">')+'</span></div></div>';
+    }).join("");
+    document.getElementById("home-players").innerHTML=PLAYERS.map(function(p){
+      return '<div class="player"><div class="avatar">'+p.name.slice(0,1)+'</div><div><h3>'+p.name+'</h3><span class="tag">'+p.tag+'</span><p>'+p.d+'</p></div></div>';
+    }).join("");
+    document.getElementById("data-update").textContent="数据更新："+DATA_UPDATED+" · 每日自动巡检最新赛事";
+  }
+
+  function renderCh(){
+    document.getElementById("ch-list").innerHTML=CHANNELS.map(function(c){
+      return '<div class="ch-card"><h3>'+c.name+'</h3><p>'+c.d+'</p><a class="ch-link" href="'+c.link+'" target="_blank" rel="noopener">'+c.txt+' ↗</a></div>';
+    }).join("");
+  }
+
+  var libState={cat:"全部",region:"全部"};
+  function renderLib(){}
+  function initLib(){}
+
+  function route(){
+    var h=location.hash.replace("#/","")||"home";
+    var views={home:"v-home",events:"v-events",guide:"v-guide",channels:"v-channels"};
+    var v=views[h]||"v-home";
+    document.querySelectorAll(".view").forEach(function(s){s.classList.remove("on");});
+    document.getElementById(v).classList.add("on");
+    document.querySelectorAll("#nav button").forEach(function(b){
+      b.classList.toggle("on",b.getAttribute("data-v")===(h==="events"?"events":h));
+    });
+    window.scrollTo(0,0);
+  }
+  document.querySelectorAll("#nav button").forEach(function(b){
+    b.addEventListener("click",function(){location.hash="#/"+b.getAttribute("data-v");});
+  });
+  window.addEventListener("hashchange",route);
+
+  function applyRemote(events,updated){
+    if(events&&events.length){EVENTS=events;if(updated){DATA_UPDATED=updated;}renderHome();renderEvents();}
+  }
+  function loadData(){
+    try{
+      fetch('data.json',{cache:'no-store'}).then(function(r){
+        if(!r.ok){throw new Error("no data.json");}
+        return r.json();
+      }).then(function(j){
+        applyRemote(j.events,j.updated);
+        var el=document.getElementById("data-update");
+        if(el){el.textContent="数据更新："+DATA_UPDATED+" · 每日自动巡检";}
+      }).catch(function(){});
+    }catch(e){}
+  }
+
+  renderFilters();
+  renderEvents();
+  renderHome();
+  renderCh();
+  route();
+  loadData();
+})();
+</script>
+</body>
+</html>
